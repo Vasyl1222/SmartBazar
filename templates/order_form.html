@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Оформлення замовлення</title>
+    <style>
+        /* Стилі залишаються такими ж */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+        
+        * {
+            font-family: 'Montserrat', sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            line-height: 1.6;
+            background-color: #f8f8f8;
+        }
+
+        h2, h3 {
+            font-size: 28px;
+            margin-top: 30px;
+            text-align: center;
+            color: #333;
+        }
+
+        .order-form-container {
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            width: 80%;
+            margin: 0 auto;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            position: relative; 
+        }
+
+        .order-details, .customer-info {
+            margin-bottom: 30px;
+        }
+
+        .order-items-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .order-items-table th, .order-items-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #FD7E14;
+        }
+
+        .order-items-table th {
+            background-color: #f4f4f4;
+        }
+
+        .order-summary {
+            margin-top: 20px;
+            text-align: right;
+        }
+
+        .order-summary span {
+            font-weight: bold;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 16px;
+            color: #333;
+        }
+
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #FD7E14;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        .form-group textarea {
+            height: 100px;
+        }
+
+        .submit-btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            background-color: #2C3E50;
+            color: #FD7E14;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .submit-btn:hover {
+            background-color: #34495E;
+        }
+
+        .promo-code-container {
+            margin-bottom: 20px;
+        }
+
+        .promo-code-input {
+            padding: 10px;
+            width: 100%;
+            border: 1px solid #FD7E14;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        .promo-code-btn {
+            padding: 10px 20px;
+            background-color: #FD7E14;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .promo-code-btn:hover {
+            background-color: #E67E22;
+        }
+
+        #promo-message, #promo-error-message {
+            display: none;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+
+        #promo-message {
+            color: green;
+        }
+
+        #promo-error-message {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <div class="order-form-container">
+        <h2>Оформлення замовлення</h2>
+        
+        <div class="order-details">
+            <h3>Ваші товари:</h3>
+            <table class="order-items-table">
+                <thead>
+                    <tr>
+                        <th>Назва</th>
+                        <th>Ціна</th>
+                        <th>Кількість</th>
+                        <th>Загальна ціна</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in cart_items %}
+                    <tr>
+                        <td>{{ item.name }}</td>
+                        <td>{{ item.price }} грн</td>
+                        <td>{{ item.quantity }}</td>
+                        <td class="item-total">{{ item.price * item.quantity }} грн</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="order-summary">
+            <span>Загальна сума: <span id="total-price">{{ total_price }}</span> грн</span>
+        </div>
+
+
+
+        <form id="order-form" action="{{ url_for('submit_order') }}" method="POST">
+            <div class="promo-code-container">
+                <input type="text" id="promo-code" class="promo-code-input" placeholder="Введіть промокод">
+                <button id="apply-promo-btn" class="promo-code-btn">Застосувати</button>
+                <p id="promo-message">Промокод успішно застосовано!</p>
+                <p id="promo-error-message">Невірний або вже використаний промокод!</p>
+            </div>
+            <div class="customer-info">
+                <div class="form-group">
+                    <label for="name">Ім'я</label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="phone">Телефон</label>
+                    <input type="tel" id="phone" name="phone" required>
+                </div>
+                <div class="form-group">
+                    <label for="address">Адреса</label>
+                    <input type="text" id="address" name="address" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Електронна пошта</label>
+                    <input type="email" id="email" name="email" required>
+                </div>                
+                <div class="form-group">
+                    <label for="comments">Коментарі</label>
+                    <textarea id="comments" name="comments"></textarea>
+                </div>
+            </div>
+
+            <button type="submit" class="submit-btn" id="submit-order-btn" disabled>Оформити замовлення</button>
+        </form>
+    </div>
+
+    <script>
+        // Функція для перевірки заповнення полів
+        function checkFormValidity() {
+            var name = document.getElementById('name').value;
+            var phone = document.getElementById('phone').value;
+            var address = document.getElementById('address').value;
+            var email = document.getElementById('email').value; 
+
+            // Якщо всі поля заповнені, дозволяємо натискати кнопку
+            var submitButton = document.getElementById('submit-order-btn');
+            if (name && phone && address && email) {
+                submitButton.disabled = false;
+            } else {
+                submitButton.disabled = true;
+            }
+        }
+
+        // Обробка вводу для телефону (дозволяються тільки цифри)
+        document.getElementById('phone').addEventListener('input', function(e) {
+            e.target.value = e.target.value.replace(/[^0-9]/g, ''); // Очищаємо від нецифрових символів
+        });
+
+        // Обробник промокоду
+        let promoApplied = false;  // Прапор, що вказує, чи промокод вже застосований
+
+        // Функція для обробки промокоду
+        document.getElementById('apply-promo-btn').addEventListener('click', function() {
+            if (promoApplied) {
+                // Якщо промокод вже застосовано, не даємо застосувати знову
+                alert("Промокод вже застосовано!");
+                return;
+            }
+
+            var promoCode = document.getElementById('promo-code').value;
+            var totalPrice = parseFloat(document.getElementById('total-price').textContent);
+            var discount = 0;
+
+            // Перевірка наявності та правильності промокоду
+            switch (promoCode.toUpperCase()) {
+                case 'SALE20':
+                    discount = totalPrice * 0.2;
+                    break;
+                case 'SALE30':
+                    discount = totalPrice * 0.3;
+                    break;
+                default:
+                    discount = 0;
+                    break;
+            }
+
+            if (discount > 0) {
+                promoApplied = true;
+                var newTotalPrice = totalPrice - discount;
+                document.getElementById('total-price').textContent = newTotalPrice.toFixed(2);
+                document.getElementById('promo-message').style.display = 'block';
+                document.getElementById('promo-error-message').style.display = 'none';
+            } else {
+                document.getElementById('promo-message').style.display = 'none';
+                document.getElementById('promo-error-message').style.display = 'block';
+            }
+        });
+
+        // Оновлюємо прапор промокоду після відправлення форми
+        document.getElementById('order-form').addEventListener('submit', function() {
+            promoApplied = false;  // Скидаємо прапор промокоду після оформлення замовлення
+        });
+
+        // Перевірка валідності форми при зміні значень
+        document.getElementById('name').addEventListener('input', checkFormValidity);
+        document.getElementById('phone').addEventListener('input', checkFormValidity);
+        document.getElementById('address').addEventListener('input', checkFormValidity);
+        document.getElementById('email').addEventListener('input', checkFormValidity);
+        
+        // Оновлюємо кнопку після завантаження сторінки
+        checkFormValidity();
+    </script>
+</body>
+</html>
