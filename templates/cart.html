@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/static/images/logo.png" type="image/x-icon">
     <title>SmartBazar</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
@@ -14,14 +15,21 @@
             box-sizing: border-box;
             
         }
+        html, body {
+    height: 100%;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+body {
+    font-family: 'Montserrat', sans-serif;
+    line-height: 1.6;
+    background-color: #f8f8f8;
+}
+
     
-        body {
-            font-family: 'Montserrat', sans-serif;
-            line-height: 1.6;
-            background-color: #f8f8f8;
-            
-        }
-    
+        
         h2 {
             text-align: center;
             font-size: 28px;
@@ -214,16 +222,17 @@
             transform: scale(1.2);
             opacity: 0.7;
         }
-        #footer {
-            background-color: #2C3E50;
-            color: #FD7E14;
-            padding: 20px;
-            display: flex;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            font-family: 'Roboto', sans-serif;
-        }
-
+  
+footer {
+    flex-shrink: 0; 
+    background-color: #2C3E50;
+    color: #FD7E14;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    font-family: 'Roboto', sans-serif;
+}
         .footer-column {
             flex: 1;
             min-width: 200px;
@@ -265,7 +274,7 @@
 <body>
     <header>
         <div style="margin-left: 50px;" class="header-left">
-            <a href="/" class="logo">
+            <a href="/" style="margin-top: -15px;" class="logo">
                 <img src="/static/images/logo.png" alt="Logo">
             </a>
             <a href="/" class="site-title">SmartBazar</a>
@@ -283,47 +292,42 @@
             </a>
         </div>
     </header>
-
     <h2>Ваш кошик</h2>
 
-{% if cart_items %}
-    <div class="cart-items">
-        {% for item in cart_items %}
-            <div class="cart-item">
-                <img style="width: 100px; height: 100px; object-fit: contain;" src="{{ item.image }}" alt="">
-                <div class="cart-item-details">
-                    <h3>{{ item.name }}</h3>
-                    <p>{{ item.price }} грн</p>
-                    <p>Кількість: {{ item.quantity }}</p>
+    {% if cart_items %}
+        <div class="cart-items">
+            {% for item in cart_items %}
+                <div class="cart-item">
+                    <img style="width: 100px; height: 100px; object-fit: contain;" src="{{ item.image }}" alt="">
+                    <div class="cart-item-details">
+                        <h3>{{ item.name }}</h3>
+                        <p>{{ item.price }} грн</p>
+                        <p>Кількість: {{ item.quantity }}</p>
+                    </div>
+                    <div class="quantity-control">
+                        <form action="{{ url_for('update_quantity', product_id=item.product_id) }}" method="POST">
+                            <input type="hidden" name="decrement" value="1">
+                            <button type="submit">-</button>
+                        </form>
+                        <form action="{{ url_for('update_quantity', product_id=item.product_id) }}" method="POST">
+                            <input type="hidden" name="increment" value="1">
+                            <button type="submit">+</button>
+                        </form>
+                    </div>
+                    <a class="remove-button" href="{{ url_for('remove_from_cart', product_id=item.product_id) }}">Видалити</a>
                 </div>
-                <div class="quantity-control">
-                    <!-- Зменшити кількість товару -->
-                    <form action="{{ url_for('update_quantity', product_id=item.product_id) }}" method="POST">
-                        <input type="hidden" name="quantity" value="{{ item.quantity - 1 }}">
-                        <button type="submit">-</button>
-                    </form>
-                    <!-- Збільшити кількість товару -->
-                    <form action="{{ url_for('update_quantity', product_id=item.product_id) }}" method="POST">
-                        <input type="hidden" name="quantity" value="{{ item.quantity + 1 }}">
-                        <button type="submit">+</button>
-                    </form>
-                </div>
-                <!-- Посилання для видалення товару з кошика -->
-                <a class="remove-button" href="{{ url_for('remove_from_cart', product_id=item.product_id) }}">Видалити</a>
-            </div>
-        {% endfor %}
-    </div>
-
-    <h3 class="total-price">Загальна сума: ₴{{ total_price }}</h3>
-
-    <!-- Кнопка оформлення замовлення -->
-    <form action="{{ url_for('order_form') }}" method="GET">
-        <button type="submit" class="checkout-button">Оформити замовлення</button>
-    </form>    
-{% else %}
-    <p class="empty-cart">Ваш кошик порожній.</p>
-{% endif %}
-
+            {% endfor %}
+        </div>
+    
+        <h3 class="total-price">Загальна сума: ₴{{ total_price }}</h3>
+    
+        <form action="{{ url_for('order_form') }}" method="GET">
+            <button type="submit" class="checkout-button">Оформити замовлення</button>
+        </form>    
+    {% else %}
+        <p class="empty-cart">Ваш кошик порожній.</p>
+    {% endif %}
+    
     
     <footer id="footer" >
         <div class="footer-column"></div>
@@ -354,6 +358,5 @@
             <a href="#social">Соціальні мережі</a>
         </div>
     </footer>
-
 </body>
 </html>

@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/static/images/logo.png" type="image/x-icon">
     <title>SmartBazar</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
@@ -17,6 +18,7 @@
             box-sizing: border-box;
             width: 100%;
             overflow-x: hidden;
+            background-color: #f8f8f8;
         }
 
         header {
@@ -357,7 +359,6 @@
             display: block;
         }
 
-/* Стилі для випадаючого меню */
 .dropdown {
     position: relative;
     display: inline-block;
@@ -409,7 +410,7 @@
 }
 .filter-sort-container {
     display: flex;
-    justify-content: flex-start;  /* вирівнювання зліва */
+    justify-content: flex-start;
     align-items: center;
     margin-bottom: 20px;
 }
@@ -503,7 +504,7 @@
 <body>
     <header>
         <div style="margin-left: 50px;" class="header-left">
-            <a href="/" class="logo">
+            <a href="/" style="margin-top: -15px;" class="logo">
                 <img src="/static/images/logo.png" alt="Logo">
             </a>
             <a href="/" class="site-title">SmartBazar</a>
@@ -524,7 +525,6 @@
 
 
     <div class="filter-sort-container">    
-        <!-- Фільтрація -->
         <div class="dropdown">
             <button class="dropdown-btn">Фільтрувати за категорією</button>
             <div class="dropdown-content">
@@ -536,7 +536,6 @@
             </div>
         </div>
     
-        <!-- Сортування -->
         <div class="dropdown">
             <button class="dropdown-btn">Сортувати</button>
             <div class="dropdown-content">
@@ -546,7 +545,6 @@
                 <a href="{{ url_for('all_products', category=request.args.get('category'), sort_by='name', sort_order='desc') }}">Алфавіт (Я-А)</a>
             </div>
         </div>
-        <!-- Пошук -->
         <form method="get" action="/all_products" class="search-form">
             <input type="text" name="search" value="{{ search_query }}" placeholder="Пошук...">
             <button type="submit">Search</button>

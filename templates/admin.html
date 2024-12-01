@@ -3,11 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/static/images/logo.png" type="image/x-icon">
     <title>SmartBazar</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
+            background-color: #f8f8f8;
             margin: 0;
             padding: 0;
             color: #333;
@@ -79,6 +80,7 @@
                 <th>Username</th>
                 <th>Email</th>
                 <th>Password</th>
+                <th>Phone</th> 
             </tr>
         </thead>
         <tbody>
@@ -88,6 +90,7 @@
                 <td>{{ user.username }}</td>
                 <td>{{ user.email }}</td>
                 <td>{{ user.password }}</td>
+                <td>{{ user.phone }}</td>
             </tr>
             {% endfor %}
         </tbody>
@@ -102,6 +105,9 @@
                 <th>Name</th>
                 <th>Address</th>
                 <th>Comments</th>
+                <th>Email</th> 
+                <th>Promo Code</th> 
+                <th>Total Price</th> 
                 <th>Created At</th>
             </tr>
         </thead>
@@ -113,6 +119,9 @@
                 <td>{{ order.name }}</td>
                 <td>{{ order.address }}</td>
                 <td>{{ order.comments }}</td>
+                <td>{{ order.email }}</td> 
+                <td>{{ order.promo_code }}</td> 
+                <td>{{ order.total_price }}</td> 
                 <td>{{ order.created_at }}</td>
             </tr>
             {% endfor %}
@@ -146,6 +155,7 @@
             {% endfor %}
         </tbody>
     </table>
+    
     <h2>Відгуки</h2>
     <table>
         <thead>
@@ -169,7 +179,6 @@
             {% endfor %}
         </tbody>
     </table>
-    
 
 </body>
 </html>
