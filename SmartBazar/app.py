@@ -435,24 +435,78 @@ def register():
 
     return jsonify({'success': True, 'message': 'Реєстрація успішна'}), 201
 
-@app.route('/profile')
+
+from flask import Flask, render_template, request, redirect, url_for, session
+from werkzeug.utils import secure_filename
+import os
+
+UPLOAD_FOLDER = 'static/uploads'
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+app.config['UPLOAD_FOLDER'] = os.path.join(app.root_path, 'static', 'uploads')
+
+
+@app.route('/profile', methods=['GET', 'POST'])
 def profile():
     if 'email' not in session:
-        return redirect(url_for('login')) 
+        return redirect(url_for('login'))
 
-    email = session['email']  
+    email = session['email']
 
     with get_db_connection() as conn:
         cursor = conn.cursor()
 
+        cursor.execute('SELECT * FROM users WHERE email = ?', (email,))
+        user_data = cursor.fetchone()
+
+        error = None
+
+        if request.method == 'POST':
+            new_username = request.form['username']
+            new_email = request.form['email']
+            new_profile_picture = request.files.get('profile_picture')
+
+            if new_username == user_data['username'] and new_email == user_data['email']:
+                error = "Немає змін у даних профілю!"
+                return render_template('profile.html', user_data=user_data, error=error)
+
+            cursor.execute('SELECT * FROM users WHERE email = ?', (new_email,))
+            existing_user = cursor.fetchone()
+
+            if existing_user and existing_user['email'] != user_data['email']:
+                error = "Цей email вже зареєстрований!"
+                return render_template('profile.html', user_data=user_data, error=error)
+
+            if new_username != user_data['username'] or new_email != user_data['email']:
+                cursor.execute('UPDATE users SET username = ?, email = ? WHERE email = ?',
+                               (new_username, new_email, email))
+                conn.commit()
+
+            if new_profile_picture and allowed_file(new_profile_picture.filename):
+                filename = secure_filename(new_profile_picture.filename)
+                filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                new_profile_picture.save(filepath)
+
+                cursor.execute('UPDATE users SET profile_picture = ? WHERE email = ?', (filename, new_email))
+                conn.commit()
+
+            session['username'] = new_username
+            session['email'] = new_email
+
+            return redirect(url_for('profile'))
+
         cursor.execute('SELECT * FROM orders WHERE email = ?', (email,))
-        orders = cursor.fetchall()  
+        orders = cursor.fetchall()
 
         order_items = []
         for order in orders:
-            order_id = order['id'] 
+            order_id = order['id']
             cursor.execute('SELECT * FROM order_items WHERE order_id = ?', (order_id,))
-            items = cursor.fetchall() 
+            items = cursor.fetchall()
 
             for item in items:
                 order_items.append({
@@ -464,10 +518,19 @@ def profile():
                 })
 
         cursor.execute('SELECT * FROM reviews WHERE email = ?', (email,))
-        reviews = cursor.fetchall() 
+        reviews = cursor.fetchall()
 
-    return render_template('profile.html', username=session['username'], orders=orders, order_items=order_items, reviews=reviews)
+    return render_template('profile.html', user_data=user_data, orders=orders, order_items=order_items, reviews=reviews, error=error)
 
+def get_product_by_id(product_id):
+    conn = sqlite3.connect('your_database.db')
+    cursor = conn.cursor()
+
+    cursor.execute('SELECT * FROM products WHERE id = ?', (product_id,))
+    product = cursor.fetchone()  
+
+    conn.close()
+    return product
 
 
 

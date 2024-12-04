@@ -356,6 +356,19 @@
             object-fit: cover;
             display: block;
         }
+        .icon-container {
+    position: absolute;
+    top: 50px;
+    left: 50px;
+    cursor: pointer;
+}
+
+.icon-container img {
+    width: 30px;
+    height: 30px;
+    transition: transform 0.3s ease;
+}
+
  
     </style>
 </head>
@@ -392,11 +405,8 @@
             <img src="/static/images/baner3.jpg" alt="Ad 3">
         </div>
     </div>
-    
-
     <div class="product-section">
         <h2 class="section-title">Популярні товари</h2>
-
         <div class="product-container">
             {% if products %}
                 {% for product in products %}
@@ -408,6 +418,8 @@
                             <p class="product-price">₴{{ product.price }}</p>
                         </div>
                         <div class="card-back">
+                            <div class="icon-container">
+                            </div>
                             <h4>Характеристики:</h4>
                             <ul class="product-chars">
                                 <li>{{ product.char1 }}</li>
@@ -425,9 +437,7 @@
                 <p>No popular products available.</p>
             {% endif %}
         </div>
-        
     </div>
-
     <footer id="footer" >
         <div class="footer-column"></div>
         <img src="/static/images/masterVisa.png" style="width: 100px; height: 100px; margin-left: -300px; margin-right: 50px;" alt="">
@@ -457,8 +467,6 @@
             <a href="#social">Соціальні мережі</a>
         </div>
     </footer>
-
-
     <script>
         let currentAdIndex = 0;
         const ads = document.querySelectorAll('.ad-banner');
@@ -470,12 +478,12 @@
             
             ads[currentAdIndex].style.display = 'block';
         }
-    
         setInterval(switchAd, 2000);
-    
         switchAd();
+
+
+
+
     </script>
-    
-    
 </body>
 </html>

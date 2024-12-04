@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/static/images/logo.png" type="image/x-icon">
+    <title>SmartBazar</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f8f8;
+            margin: 0;
+            padding: 0;
+            display: flex;
+        }
+
+        .sidebar {
+            width: 250px;
+            background-color: #2C3E50;
+            color: white;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            height: 100vh;
+        }
+
+        .sidebar a {
+            color: white;
+            text-decoration: none;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .sidebar a:hover {
+            background-color: #FD7E14;
+        }
+
+        .content {
+            flex-grow: 1;
+            padding: 20px;
+        }
+
+        .content h2 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        .profile-form {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            margin: auto;
+        }
+
+        .profile-form h3 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #2C3E50;
+        }
+
+        .profile-form .profile-pic {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background-color: #ccc;
+            margin: 0 auto 20px;
+            background-size: cover;
+        }
+
+        .profile-form div {
+            margin-bottom: 15px;
+        }
+
+        .profile-form label {
+            display: block;
+            margin-bottom: 5px;
+            color: #2C3E50;
+        }
+
+        .profile-form input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+
+        .profile-form input[type="file"] {
+            display: none; /* Приховуємо стандартну кнопку завантаження файлу */
+        }
+
+        .profile-form input:focus {
+            border-color: #FD7E14;
+        }
+
+        /* Кастомні кнопки */
+        .button {
+            width: 100%;
+            padding: 10px;
+            background-color: #2C3E50; /* Колір фону */
+            color: #FD7E14; /* Колір тексту */
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            text-align: center; /* Текст по центру */
+        }
+
+        .button:hover {
+            background-color: #1A2633; /* Трохи темніший колір при наведенні */
+        }
+        /* Стилі для таблиці */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+th, td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+th {
+    background-color: #2C3E50; /* Синій колір фону для заголовків */
+    color: #FD7E14; /* Колір тексту заголовків */
+    font-weight: bold;
+}
+
+tr:nth-child(even) {
+    background-color: #f2f2f2; /* Світлий фон для парних рядків */
+}
+
+tr:hover {
+    background-color: #d1e1e8; /* Легкий синій фон для рядка при наведенні */
+}
+
+td {
+    background-color: #ffffff; /* Білий фон для комірок */
+    color: #333; /* Темно-сірий колір для тексту */
+}
+
+/* Додаткові стилі для таблиць */
+table th, table td {
+    border: 1px solid #ddd; /* Тонка лінія для комірок */
+}
+
+
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <a href="javascript:void(0);" onclick="showContent('profile')">Профіль</a>
+        <a href="javascript:void(0);" onclick="showContent('orders')">Покупки</a>
+        <a href="javascript:void(0);" onclick="showContent('reviews')">Відгуки</a>
+        <a href="javascript:void(0);" onclick="showContent('favorites')">Улюблене</a>
+    </div>
+
+    <div class="content">
+        <div id="profile" class="content-section">
+            <h2>Профіль</h2>
+            
+            <!-- Якщо є помилка, відобразити її -->
+            {% if error %}
+                <div class="error-message" style="color: red;">
+                    {{ error }}
+                </div>
+            {% endif %}
+            
+            <div class="profile-form">
+                <h3>Оновити профіль</h3>
+                <form action="{{ url_for('profile') }}" method="POST" enctype="multipart/form-data">
+                    <div>
+                        <label for="username">Username:</label>
+                        <input type="text" id="username" name="username" value="{{ user_data['username'] }}" required>
+                    </div>
+                
+                    <div>
+                        <label for="email">Email:</label>
+                        <input type="email" id="email" name="email" value="{{ user_data['email'] }}" required>
+                    </div>
+                
+                    <div>
+                        <label for="profile_picture" class="file-upload-btn">Оберіть фото</label>
+                        <input type="file" id="profile_picture" name="profile_picture" class="file-upload" accept="image/*">
+                    </div>
+                
+                    <div id="profile-pic-preview" class="profile-pic"></div>
+                    <button type="submit" class="button">Оновити профіль</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Інші розділи -->
+        <div id="orders" class="content-section" style="display:none;">
+            <h2>Ваші Покупки</h2>
+            {% if orders %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>№ Замовлення</th>
+                            <th>Дата</th>
+                            <th>Товари</th>
+                            <th>Загальна сума</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for order in orders %}
+                            <tr>
+                                <td>{{ order.id }}</td>
+                                <td>{{ order.date }}</td>
+                                <td>
+                                    {% for item in order_items %}
+                                        {% if item['order_id'] == order['id'] %}
+                                            <div>{{ item['product_name'] }} - {{ item['total_price'] }} грн</div>
+                                        {% endif %}
+                                    {% endfor %}
+                                </td>
+                                <td>{{ order.total_price }} грн</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p>У вас ще немає покупок.</p>
+            {% endif %}
+        </div>
+
+        <div id="reviews" class="content-section" style="display:none;">
+            <h2>Ваші Відгуки</h2>
+            {% if reviews %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>№ Відгука</th>
+                            <th>Відгук</th>
+                            <th>Час написання</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for review in reviews %}
+                            <tr>
+                                <td>{{ review.id }}</td>
+                                <td>{{ review.review }}</td>
+                                <td>{{ review.created_at }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p>Ви ще не залишали жодного відгуку.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <div id="favorites" class="content-section" style="display:none;">
+        <h2>Ваше Улюблене</h2>
+        {% if favorites %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Товар</th>
+                        <th>Ціна</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in favorites %}
+                        <tr>
+                            <td>{{ item['name'] }}</td>
+                            <td>{{ item['price'] }} грн</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>Ви ще не додали товари в улюблене.</p>
+        {% endif %}
+    </div>
+    
+
+    <script>function showContent(section) {
+        const sections = document.querySelectorAll('.content-section');
+        sections.forEach(function(section) {
+            section.style.display = 'none';
+        });
+    
+        const selectedSection = document.getElementById(section);
+        if (selectedSection) {
+            selectedSection.style.display = 'block';
+        }
+    }
+    
+
+        window.onload = function() {
+            const profilePic = localStorage.getItem('profile_picture');
+            if (profilePic) {
+                document.getElementById('profile-pic-preview').style.backgroundImage = `url(${profilePic})`;
+            }
+        }
+
+        document.getElementById('profile_picture').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+        
+                reader.onload = function(e) {
+                    localStorage.setItem('profile_picture', e.target.result);
+                    document.getElementById('profile-pic-preview').style.backgroundImage = `url(${e.target.result})`;
+                }
+        
+                reader.readAsDataURL(file);
+            }
+        });
+    </script>
+</body>
+</html>
