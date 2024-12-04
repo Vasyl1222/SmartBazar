@@ -261,6 +261,8 @@ def order_form():
 
     return render_template('order_form.html', cart_items=cart_items, total_price=total_price)
 
+
+
 @app.route('/submit_order', methods=['POST'])
 def submit_order():
     name = request.form.get('name')
@@ -291,10 +293,12 @@ def submit_order():
                     product_price = 0  
                 total_price += product_price * item['quantity']
 
+        bonus_amount = total_price * 0.01  
+
         cursor.execute(''' 
-            INSERT INTO orders (name, phone, address, email, comments, promo_code, total_price)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
-        ''', (name, phone, address, email, comments, promo_code, total_price))
+            INSERT INTO orders (name, phone, address, email, comments, promo_code, total_price, bonus_amount)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        ''', (name, phone, address, email, comments, promo_code, total_price, bonus_amount))
 
         order_id = cursor.lastrowid  
         conn.commit()  
@@ -322,14 +326,31 @@ def submit_order():
             else:
                 print(f"Товар не знайдений для ID: {item['product_id']}")
 
-        conn.commit() 
+        conn.commit()  
 
     session.pop('cart', None)
 
     flash("Ваше замовлення успішно оформлене.")
     return redirect(url_for('index'))
+@app.route('/informatsiia.html')
+def informatsiia():
+    return render_template('footer/informatsiia.html')
 
+@app.route('/komanda.html')
+def komanda():
+    return render_template('footer/komanda.html')
 
+@app.route('/SpisokPoslug.html')
+def spisok_poslug():
+    return render_template('footer/SpisokPoslug.html')
+
+@app.route('/Price.html')
+def price():
+    return render_template('footer/Price.html')
+
+@app.route('/Question.html')
+def question():
+    return render_template('footer/Question.html')
 
 
 @app.route('/admin')
@@ -345,7 +366,7 @@ def admin_panel():
             phone
         FROM 
             users;
-        '''
+    '''
 
     users = conn.execute(users_query).fetchall()
 
@@ -359,10 +380,11 @@ def admin_panel():
             email, 
             promo_code, 
             total_price, 
+            bonus_amount,  -- Додано поле для бонусів
             created_at
         FROM 
             orders;
-        '''
+    '''
 
     orders = conn.execute(orders_query).fetchall()
 
@@ -381,15 +403,15 @@ def admin_panel():
     order_items = conn.execute(order_items_query).fetchall()
 
     reviews_query = '''
-            SELECT 
-                id, 
-                name, 
-                email, 
-                review,
-                created_at
-            FROM 
-                reviews;
-        '''
+        SELECT 
+            id, 
+            name, 
+            email, 
+            review,
+            created_at
+        FROM 
+            reviews;
+    '''
 
     reviews = conn.execute(reviews_query).fetchall()
 
@@ -450,6 +472,10 @@ def allowed_file(filename):
 app.config['UPLOAD_FOLDER'] = os.path.join(app.root_path, 'static', 'uploads')
 
 
+def get_db_connection():
+    conn = sqlite3.connect('database.db')
+    conn.row_factory = sqlite3.Row  
+    return conn
 @app.route('/profile', methods=['GET', 'POST'])
 def profile():
     if 'email' not in session:
@@ -461,7 +487,7 @@ def profile():
         cursor = conn.cursor()
 
         cursor.execute('SELECT * FROM users WHERE email = ?', (email,))
-        user_data = cursor.fetchone()
+        user_data = dict(cursor.fetchone())  
 
         error = None
 
@@ -477,7 +503,7 @@ def profile():
             cursor.execute('SELECT * FROM users WHERE email = ?', (new_email,))
             existing_user = cursor.fetchone()
 
-            if existing_user and existing_user['email'] != user_data['email']:
+            if existing_user and dict(existing_user)['email'] != user_data['email']:
                 error = "Цей email вже зареєстрований!"
                 return render_template('profile.html', user_data=user_data, error=error)
 
@@ -500,13 +526,13 @@ def profile():
             return redirect(url_for('profile'))
 
         cursor.execute('SELECT * FROM orders WHERE email = ?', (email,))
-        orders = cursor.fetchall()
+        orders = [dict(order) for order in cursor.fetchall()]
 
         order_items = []
         for order in orders:
             order_id = order['id']
             cursor.execute('SELECT * FROM order_items WHERE order_id = ?', (order_id,))
-            items = cursor.fetchall()
+            items = [dict(item) for item in cursor.fetchall()]
 
             for item in items:
                 order_items.append({
@@ -517,10 +543,24 @@ def profile():
                     'total_price': item['total_price']
                 })
 
-        cursor.execute('SELECT * FROM reviews WHERE email = ?', (email,))
-        reviews = cursor.fetchall()
+        cursor.execute('SELECT created_at, bonus_amount FROM orders WHERE email = ?', (email,))
+        bonuses = cursor.fetchall()
 
-    return render_template('profile.html', user_data=user_data, orders=orders, order_items=order_items, reviews=reviews, error=error)
+        bonus_data = [{'date': bonus[0], 'amount': bonus[1]} for bonus in bonuses]
+
+        cursor.execute('SELECT * FROM reviews WHERE email = ?', (email,))
+        reviews = [dict(review) for review in cursor.fetchall()]
+
+    return render_template(
+        'profile.html',
+        user_data=user_data,
+        orders=orders,
+        order_items=order_items,
+        reviews=reviews,
+        bonuses=bonus_data,  
+        error=error
+    )
+
 
 def get_product_by_id(product_id):
     conn = sqlite3.connect('your_database.db')

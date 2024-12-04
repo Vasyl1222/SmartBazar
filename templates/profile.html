@@ -92,68 +92,64 @@
         }
 
         .profile-form input[type="file"] {
-            display: none; /* Приховуємо стандартну кнопку завантаження файлу */
+            display: none; 
         }
 
         .profile-form input:focus {
             border-color: #FD7E14;
         }
 
-        /* Кастомні кнопки */
         .button {
             width: 100%;
             padding: 10px;
-            background-color: #2C3E50; /* Колір фону */
-            color: #FD7E14; /* Колір тексту */
+            background-color: #2C3E50; 
+            color: #FD7E14;
             border: none;
             border-radius: 5px;
             font-size: 16px;
             cursor: pointer;
             transition: background-color 0.3s;
-            text-align: center; /* Текст по центру */
+            text-align: center; 
         }
 
         .button:hover {
-            background-color: #1A2633; /* Трохи темніший колір при наведенні */
+            background-color: #1A2633; 
         }
-        /* Стилі для таблиці */
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
-}
 
-th, td {
-    padding: 12px 15px;
-    text-align: left;
-    border-bottom: 1px solid #ddd;
-}
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
 
-th {
-    background-color: #2C3E50; /* Синій колір фону для заголовків */
-    color: #FD7E14; /* Колір тексту заголовків */
-    font-weight: bold;
-}
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
 
-tr:nth-child(even) {
-    background-color: #f2f2f2; /* Світлий фон для парних рядків */
-}
+        th {
+            background-color: #2C3E50; 
+            color: #FD7E14;
+            font-weight: bold;
+        }
 
-tr:hover {
-    background-color: #d1e1e8; /* Легкий синій фон для рядка при наведенні */
-}
+        tr:nth-child(even) {
+            background-color: #f2f2f2; 
+        }
 
-td {
-    background-color: #ffffff; /* Білий фон для комірок */
-    color: #333; /* Темно-сірий колір для тексту */
-}
+        tr:hover {
+            background-color: #d1e1e8; 
+        }
 
-/* Додаткові стилі для таблиць */
-table th, table td {
-    border: 1px solid #ddd; /* Тонка лінія для комірок */
-}
+        td {
+            background-color: #ffffff; 
+            color: #333; 
+        }
 
-
+        table th, table td {
+            border: 1px solid #ddd; 
+        }
     </style>
 </head>
 <body>
@@ -161,22 +157,20 @@ table th, table td {
         <a href="javascript:void(0);" onclick="showContent('profile')">Профіль</a>
         <a href="javascript:void(0);" onclick="showContent('orders')">Покупки</a>
         <a href="javascript:void(0);" onclick="showContent('reviews')">Відгуки</a>
-        <a href="javascript:void(0);" onclick="showContent('favorites')">Улюблене</a>
+        <a href="javascript:void(0);" onclick="showContent('bonuses')">Бонуси</a> 
     </div>
 
     <div class="content">
         <div id="profile" class="content-section">
-            <h2>Профіль</h2>
             
-            <!-- Якщо є помилка, відобразити її -->
             {% if error %}
                 <div class="error-message" style="color: red;">
                     {{ error }}
                 </div>
             {% endif %}
             
-            <div class="profile-form">
-                <h3>Оновити профіль</h3>
+            <div class="profile-form" style="margin-top: 100px;">
+                <h3 style="font-size: 26px;">Профіль</h3>
                 <form action="{{ url_for('profile') }}" method="POST" enctype="multipart/form-data">
                     <div>
                         <label for="username">Username:</label>
@@ -199,7 +193,6 @@ table th, table td {
             </div>
         </div>
 
-        <!-- Інші розділи -->
         <div id="orders" class="content-section" style="display:none;">
             <h2>Ваші Покупки</h2>
             {% if orders %}
@@ -259,32 +252,32 @@ table th, table td {
                 <p>Ви ще не залишали жодного відгуку.</p>
             {% endif %}
         </div>
-    </div>
 
-    <div id="favorites" class="content-section" style="display:none;">
-        <h2>Ваше Улюблене</h2>
-        {% if favorites %}
-            <table>
-                <thead>
-                    <tr>
-                        <th>Товар</th>
-                        <th>Ціна</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for item in favorites %}
+        <div id="bonuses" class="content-section" style="display:none; margin-right: 500px;">
+            <h2>Ваші Бонуси</h2>
+            {% if bonuses %}
+                <table>
+                    <thead>
                         <tr>
-                            <td>{{ item['name'] }}</td>
-                            <td>{{ item['price'] }} грн</td>
+                            <th>Дата покупки</th>
+                            <th>Кількість бонусів</th>
                         </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        {% else %}
-            <p>Ви ще не додали товари в улюблене.</p>
-        {% endif %}
+                    </thead>
+                    <tbody>
+                        {% for bonus in bonuses %}
+                            <tr>
+                                <td>{{ bonus.date }}</td> 
+                                <td>{{ bonus.amount }}</td> 
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p>У вас немає бонусів.</p>
+            {% endif %}
+        </div>
+
     </div>
-    
 
     <script>function showContent(section) {
         const sections = document.querySelectorAll('.content-section');
@@ -298,27 +291,28 @@ table th, table td {
         }
     }
     
+    window.onload = function() {
+    const profilePic = localStorage.getItem('profile_picture');
+    if (profilePic) {
+        document.getElementById('profile-pic-preview').style.backgroundImage = `url(${profilePic})`;
+    }
+}
 
-        window.onload = function() {
-            const profilePic = localStorage.getItem('profile_picture');
-            if (profilePic) {
-                document.getElementById('profile-pic-preview').style.backgroundImage = `url(${profilePic})`;
-            }
+document.getElementById('profile_picture').addEventListener('change', function(event) {
+    const file = event.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+
+        reader.onload = function(e) {
+            localStorage.setItem('profile_picture', e.target.result);
+            document.getElementById('profile-pic-preview').style.backgroundImage = `url(${e.target.result})`;
         }
 
-        document.getElementById('profile_picture').addEventListener('change', function(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-        
-                reader.onload = function(e) {
-                    localStorage.setItem('profile_picture', e.target.result);
-                    document.getElementById('profile-pic-preview').style.backgroundImage = `url(${e.target.result})`;
-                }
-        
-                reader.readAsDataURL(file);
-            }
-        });
+        reader.readAsDataURL(file);
+    }
+});
+
     </script>
+
 </body>
 </html>

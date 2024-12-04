@@ -37,37 +37,34 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
 
-th, td {
-    padding: 12px 15px;
-    text-align: left;
-    border-bottom: 1px solid #ddd;
-}
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
 
-th {
-    background-color: #2C3E50; /* Синій колір фону для заголовків */
-    color: #FD7E14; /* Колір тексту заголовків */
-    font-weight: bold;
-}
+        th {
+            background-color: #2C3E50; 
+            color: #FD7E14; 
+            font-weight: bold;
+        }
 
-tr:nth-child(even) {
-    background-color: #f2f2f2; /* Світлий фон для парних рядків */
-}
+        tr:nth-child(even) {
+            background-color: #f2f2f2; 
+        }
 
-tr:hover {
-    background-color: #d1e1e8; /* Легкий синій фон для рядка при наведенні */
-}
+        tr:hover {
+            background-color: #d1e1e8; 
+        }
 
-td {
-    background-color: #ffffff; /* Білий фон для комірок */
-    color: #333; /* Темно-сірий колір для тексту */
-}
+        td {
+            background-color: #ffffff; 
+            color: #333; 
+        }
 
-/* Додаткові стилі для таблиць */
-table th, table td {
-    border: 1px solid #ddd; /* Тонка лінія для комірок */
-}
-
-
+        table th, table td {
+            border: 1px solid #ddd;
+        }
     </style>
 </head>
 <body>
@@ -110,6 +107,7 @@ table th, table td {
                 <th>Email</th> 
                 <th>Promo Code</th> 
                 <th>Total Price</th> 
+                <th>Bonus Amount</th> 
                 <th>Created At</th>
             </tr>
         </thead>
@@ -124,6 +122,7 @@ table th, table td {
                 <td>{{ order.email }}</td> 
                 <td>{{ order.promo_code }}</td> 
                 <td>{{ order.total_price }}</td> 
+                <td>{{ order.bonus_amount }}</td> 
                 <td>{{ order.created_at }}</td>
             </tr>
             {% endfor %}
